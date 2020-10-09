@@ -1,0 +1,38 @@
+---
+title: "SSC 442 Group 8"
+author: "Alison Ferer, Clay Herwat, Arie Park, Haoyan Lin"
+date: "October 9, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## you may need to change where the data is being pulled from depending on where it is stored on your computer
+library(tidyverse)
+library(lubridate)
+rats_raw <- read_csv("Rat_Sightings.csv", na = c("", "NA", "N/A"))
+rats_clean <- rats_raw %>%
+     rename(created_date = `Created Date`,
+            location_type = `Location Type`,
+            borough = Borough) %>%
+     mutate(created_date = mdy_hms(created_date)) %>%
+     mutate(sighting_year = year(created_date),
+            sighting_month = month(created_date),
+            sighting_day = day(created_date),
+            sighting_weekday = wday(created_date, label = TRUE, abbr = FALSE)) %>%
+     filter(borough != "Unspecified")
+```
+
+```{r}
+test <- rats_clean %>% group_by(sighting_month,borough,sighting_year) %>% summarize(count=n())
+test %>% ggplot(aes(x=sighting_month,y=count,fill=borough))+geom_col()+facet_wrap(vars(sighting_year))
+```
+```{r}
+## animation, install gganimate if you don't have it
+library(gganimate)
+p + transition_time(sighting_year)+ labs(title = "Year: {round(frame_time,digits=0)}")
+```
+
