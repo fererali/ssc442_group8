@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## you may need to change where the data is being pulled from depending on where it is stored on your computer
 library(tidyverse)
 library(lubridate)
+library(ggplot2)
 rats_raw <- read_csv("Rat_Sightings.csv", na = c("", "NA", "N/A"))
 rats_clean <- rats_raw %>%
      rename(created_date = `Created Date`,
@@ -27,8 +28,21 @@ rats_clean <- rats_raw %>%
 ```
 
 ```{r}
-test <- rats_clean %>% group_by(sighting_month,borough,sighting_year) %>% summarize(count=n())
-test %>% ggplot(aes(x=sighting_month,y=count,fill=borough))+geom_col()+facet_wrap(vars(sighting_year))
+ rats_clean %>% 
+  group_by(sighting_month, borough, sighting_year) %>% 
+  summarize(count=n()) %>%
+  ggplot(aes(x=sighting_month, y= count, fill= borough))+ 
+  geom_col()+ 
+  facet_wrap(vars(sighting_year))+
+  xlab(NULL)+
+  ylab(NULL)+
+  ggtitle("Rat Sightings from 2010 to 2020")+
+  theme(legend.position="bottom")+
+  scale_fill_discrete(name= "Borough", labels= c("Bronx","Brooklyn","Manhattan","Queens","Staten Island"))+
+  theme_minimal() +
+  theme(strip.text = element_text(face = "bold"),
+        plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 ```{r}
 ## animation, install gganimate if you don't have it
