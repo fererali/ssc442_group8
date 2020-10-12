@@ -1,0 +1,52 @@
+---
+title: "SSC 442 Group 8"
+author: "Alison Ferer, Clay Herwat, Arie Park, Haoyan Lin"
+date: "October 9, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## you may need to change where the data is being pulled from depending on where it is stored on your computer
+library(tidyverse)
+library(lubridate)
+rats_raw <- read_csv("Rat_Sightings.csv", na = c("", "NA", "N/A"))
+rats_clean <- rats_raw %>%
+     rename(created_date = `Created Date`,
+            location_type = `Location Type`,
+            borough = Borough) %>%
+     mutate(created_date = mdy_hms(created_date)) %>%
+     mutate(sighting_year = year(created_date),
+            sighting_month = month(created_date),
+            sighting_day = day(created_date),
+            sighting_weekday = wday(created_date, label = TRUE, abbr = FALSE)) %>%
+     filter(borough != "Unspecified")
+```
+
+```{r}
+test <- rats_clean %>% group_by(sighting_month,borough,sighting_year) %>% summarize(count=n())
+test %>% ggplot(aes(x=sighting_month,y=count,fill=borough))+geom_col()+facet_wrap(vars(sighting_year))
+```
+```{r}
+## animation, install gganimate if you don't have it
+library(gganimate)
+p + transition_time(sighting_year)+ labs(title = "Year: {round(frame_time,digits=0)}")
+```
+
+```{r}
+ex1 <- rats_clean %>% 
+  filter(location_type %in% c("3+ Family Apt. Building","1-2 Family Dwelling","3+ Family Mixed Use Building","Commercial Building")) %>% 
+  filter(sighting_year %in% c(2010,2019)) %>% group_by(sighting_year,location_type,borough) %>% 
+  summarize(Count=n()) %>% 
+  mutate(label_first = ifelse(sighting_year == 2010, paste0(borough, ": ", Count), NA), label_last = ifelse(sighting_year == 2019, Count, NA))
+```
+```{r}
+rats_clean %>% group_by(location_type) %>% summarize(n=n()) %>% arrange(desc(n))
+rats_season <- rats_clean %>% mutate(season=ifelse(sighting_month %in% c(12,1,2),"Winter",ifelse(sighting_month %in% c(3,4,5),"Spring",ifelse(sighting_month %in% c(6,7,8),"Summer",ifelse(sighting_month %in% c(9,10,11),"Fall",NA)))))
+rats1 <-rats_season %>% filter(location_type %in% c("3+ Family Apt. Building","1-2 Family Dwelling","3+ Family Mixed Use Building","Commercial Building")) %>% group_by(season,sighting_year,location_type) %>% summarize(count=n())
+rats1 %>% ggplot(aes(x=season,y=count,fill=location_type))+geom_col()+facet_wrap(vars(sighting_year))
+```
+
