@@ -33,16 +33,7 @@ rats_clean <- rats_raw %>%
   summarize(count=n()) %>%
   ggplot(aes(x=sighting_month, y= count, fill= borough))+ 
   geom_col()+ 
-  facet_wrap(vars(sighting_year))+
-  xlab(NULL)+
-  ylab(NULL)+
-  ggtitle("Rat Sightings from 2010 to 2020")+
-  theme(legend.position="bottom")+
-  scale_fill_discrete(name= "Borough", labels= c("Bronx","Brooklyn","Manhattan","Queens","Staten Island"))+
-  theme_minimal() +
-  theme(strip.text = element_text(face = "bold"),
-        plot.title = element_text(face = "bold"),
-        axis.text.x = element_text(angle = 45, hjust = 1))
+  facet_wrap(vars(sighting_year))
 ```
 ```{r}
 ## animation, install gganimate if you don't have it
@@ -52,5 +43,19 @@ p + transition_time(sighting_year)+ labs(title = "Year: {round(frame_time,digits
 
 ```{r}
 rats_season <- rats_clean %>% mutate(season=ifelse(sighting_month %in% c(12,1,2),"Winter",ifelse(sighting_month %in% c(3,4,5),"Spring",ifelse(sighting_month %in% c(6,7,8),"Summer",ifelse(sighting_month %in% c(9,10,11),"Fall",NA)))))
-rats_final <- rats_season %>% filter((sighting_year != 2020 | !(season %in% c("Fall","Winter")))) %>% group_by(season,sighting_year,borough) %>% summarize(count=n())
-rats_final %>% ggplot(aes(x=sighting_year,y=count,color=borough))+geom_line(size=1)+facet_wrap(vars(Season=factor(season,levels=c("Winter","Spring","Summer","Fall"))))+theme(axis.text.x = element_text(angle=90, hjust=1))+scale_color_manual(values=c("#E69F00", "#56B4E9", "#009E73","#F0E442","#0072B2"))+theme_minimal()+theme(axis.text.x = element_text(angle=90, hjust=1))+labs(x="Year",y="Number of Sightings",title="Rat Sightings in NYC over time by Season and Location Type",fill="Borough")+scale_x_continuous(breaks=c(2010,2012,2014,2016,2018,2020))
+
+rats_final <- rats_season %>% filter((sighting_year != 2020 | !(season %in% c("Fall","Winter")))) %>% 
+group_by(season,sighting_year,borough) %>% 
+summarize(count=n())
+
+rats_final %>% ggplot(aes(x=sighting_year,y=count,color=borough))+
+geom_line(size=1)+
+facet_wrap(vars(Season=factor(season,levels=c("Winter","Spring","Summer","Fall"))))+
+scale_color_manual(values=c("#E69F00", "#56B4E9", "#009E73","#F0E442","#0072B2"))+
+theme(axis.text.x = element_text(angle=90, hjust=1))+
+labs(x="Year",y="Number of Sightings",title="Rat Sightings in NYC over Time by Season and Location Type",fill="Borough")+
+scale_x_continuous(breaks=c(2010,2012,2014,2016,2018,2020))+
+scale_color_discrete(name= "Borough", labels= c("Bronx","Brooklyn","Manhattan","Queens","Staten Island"))+
+theme(axis.text.x = element_text(angle=90, hjust=1))+
+theme_minimal()
+
