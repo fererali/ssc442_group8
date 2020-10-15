@@ -57,6 +57,18 @@ values=c("#E69F00", "#56B4E9", "#009E73","#F0E442","#0072B2"))+
 labs(x="Year",y="Number of Sightings",title="Rat Sightings in NYC over Time by Season and Location Type",fill="Borough")+
 scale_x_continuous(breaks=c(2010,2012,2014,2016,2018,2020))+
 theme_minimal()
+
+
+#If we want smooth
+rats_final %>% ggplot(aes(x=sighting_year,y=count,color=borough))+
+    geom_smooth(method="loess",se=F)+
+    facet_wrap(vars(Season=factor(season,levels=c("Winter","Spring","Summer","Fall"))))+
+    scale_color_manual(name= "Borough", labels= c("Bronx","Brooklyn","Manhattan","Queens","Staten Island"),
+    values=c("#E69F00", "#56B4E9", "#009E73","#F0E442","#0072B2"))+
+    labs(x="Year",y="Number of Sightings",title="Rat Sightings in NYC over Time by Season and Location Type",fill="Borough")+
+    scale_x_continuous(breaks=c(2010,2012,2014,2016,2018,2020))+
+    theme(axis.text.x = element_text(angle=90, hjust=1))+
+    theme_minimal()
 ```
 
 
