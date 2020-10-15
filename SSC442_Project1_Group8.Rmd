@@ -58,4 +58,23 @@ scale_x_continuous(breaks=c(2010,2012,2014,2016,2018,2020))+
 scale_color_discrete(name= "Borough", labels= c("Bronx","Brooklyn","Manhattan","Queens","Staten Island"))+
 theme(axis.text.x = element_text(angle=90, hjust=1))+
 theme_minimal()
+```
 
+
+```{r}
+rats2 <-rats_season %>% 
+filter(season=="Spring") %>% 
+filter(sighting_year %in% c(2019,2020)) %>% 
+mutate(Location=ifelse(location_type %in% c("1-2 Family Dwelling","3+ Family Apt. Building",
+"3+ Family Mixed Use Building","1-2 Family Mixed Use Building"),"Residential",
+ifelse(location_type %in% c("Commercial Building","Day Care/Nursery","Government Building",
+"Office Building","Parking Lot Garage","School/Pre-School"),"Work/School","Other"))) %>% 
+group_by(Location,sighting_year) %>% 
+summarize(count=n())
+
+ggplot(rats2,aes(x=sighting_year,y=count,fill=factor(Location,levels=c("Work/School","Other","Residential"))))+
+geom_col()+
+labs(title="Spring 2019-2020 Rat Sighting Breakdown by Location Type",x="Year",y="Number of Sightings",fill="Location")+ 
+scale_x_continuous(breaks=c(2019,2020))+
+scale_fill_manual(values=c("#0072B2", "#D55E00", "#CC79A7"))
+```
