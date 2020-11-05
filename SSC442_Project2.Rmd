@@ -22,7 +22,28 @@ refugees_raw <- read_csv("refugee_status.csv", na = c("-", "X", "D"))
 ```{r}
 non_countries <- c("Africa", "Asia", "Europe", "North America", "Oceania",
                    "South America", "Unknown", "Other", "Total")
+                   
+ refugees_clean <- refugees_raw %>%
+  # Make this column name easier to work with
+  rename(origin_country = `Continent/Country of Nationality`) %>%
+  # Get rid of non-countries
+  filter(!(origin_country %in% non_countries)) %>%
+  # Convert country names to ISO3 codes
+  mutate(iso3 = countrycode(origin_country, "country.name", "iso3c",
+                            custom_match = c("Korea, North" = "PRK"))) %>%
+  # Convert ISO3 codes to country names, regions, and continents
+  mutate(origin_country = countrycode(iso3, "iso3c", "country.name"),
+         origin_region = countrycode(iso3, "iso3c", "region"),
+         origin_continent = countrycode(iso3, "iso3c", "continent")) %>%
+  # Make this data tidy
+  gather(year, number, -origin_country, -iso3, -origin_region, -origin_continent) %>%
+  # Make sure the year column is numeric + make an actual date column for years
+  mutate(year = as.numeric(year),
+         year_date = ymd(paste0(year, "-01-01")))
 
 ```
-
+```{r}
+refugees_asia <- refugees_clean %>% filter(origin_continent == "Asia") %>% 
+group_by(origin_region,year_date) %>% summarize(total = sum(number, na.rm = TRUE))
+```
 
