@@ -45,5 +45,7 @@ non_countries <- c("Africa", "Asia", "Europe", "North America", "Oceania",
 ```{r}
 refugees_asia <- refugees_clean %>% filter(origin_continent == "Asia") %>% 
 group_by(origin_region,year_date) %>% summarize(total = sum(number, na.rm = TRUE))
+
+refugees_asia %>% ggplot(aes(x=year_date,y=total,color=origin_region))+geom_line()
 ```
 
