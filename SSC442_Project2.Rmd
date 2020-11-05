@@ -1,0 +1,28 @@
+---
+title: "Project 2"
+author: "Alison Ferer, Clay Herwat, Haoyan Lin, Arie Park"
+date: "October 28, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)    # For ggplot, dplyr, and friends
+library(countrycode)  # For dealing with country names, abbreviations, and codes
+library(lubridate)    # For dealing with dates
+```
+
+```{r}
+refugees_raw <- read_csv("refugee_status.csv", na = c("-", "X", "D"))
+```
+
+```{r}
+non_countries <- c("Africa", "Asia", "Europe", "North America", "Oceania",
+                   "South America", "Unknown", "Other", "Total")
+
+```
+
+
