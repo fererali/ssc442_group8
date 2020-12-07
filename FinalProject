@@ -18,7 +18,7 @@ race_gender %>% ggplot(aes(x=complaint_year,y=n,color=VIC_RACE))+geom_line()+fac
 
 ```{r}
 boro_race <- nypd_data %>% filter(VIC_RACE %in% c("BLACK","WHITE")) %>% group_by(BORO_NM,VIC_RACE) %>% summarize(n=n())
-boro_race %>% ggplot(aes(x=BORO_NM,y=n,fill=VIC_RACE))+geom_bar(position="dodge")
+boro_race %>% ggplot(aes(x=BORO_NM,y=n,fill=VIC_RACE))+geom_col(position="dodge")
 
 boro_race_susp <- nypd_data %>% filter(SUSP_RACE %in% c("BLACK","WHITE")) %>% group_by(BORO_NM,SUSP_RACE) %>% summarize(n=n())
 boro_race_susp %>% ggplot(aes(x=BORO_NM,y=n))+geom_col(aes(fill=SUSP_RACE),position="dodge")
