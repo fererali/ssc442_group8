@@ -1,0 +1,25 @@
+```{r}
+library(tidyverse)
+library(lubridate)
+```
+
+```{r}
+nypd_data <- read.csv("NYPD_Complaint_Data_Historic.csv", header= T, na.strings="")
+nypd_data$complaint_date <- as.Date(nypd_data$CMPLNT_FR_DT, format = "%m/%d/%Y")
+nypd_data$complaint_year <- lubridate::year(nypd_data$complaint_date)
+nypd_data$complaint_month <- lubridate::month(nypd_data$complaint_date)
+```
+
+```{r}
+race_gender <- nypd_data %>% filter(complaint_year %in% c(2006:2019))%>%filter(VIC_RACE %in% c("BLACK","WHITE")) %>% 
+filter(VIC_SEX %in% c("M","F")) %>% group_by(complaint_year,VIC_RACE,VIC_SEX) %>% summarize(n=n())
+race_gender %>% ggplot(aes(x=complaint_year,y=n,color=VIC_RACE))+geom_line()+facet_wrap(vars(VIC_SEX))
+```
+
+```{r}
+boro_race <- nypd_data %>% filter(VIC_RACE %in% c("BLACK","WHITE")) %>% group_by(BORO_NM,VIC_RACE) %>% summarize(n=n())
+boro_race %>% ggplot(aes(x=BORO_NM,y=n,fill=VIC_RACE))+geom_bar(position="dodge")
+
+boro_race_susp <- nypd_data %>% filter(SUSP_RACE %in% c("BLACK","WHITE")) %>% group_by(BORO_NM,SUSP_RACE) %>% summarize(n=n())
+boro_race_susp %>% ggplot(aes(x=BORO_NM,y=n))+geom_col(aes(fill=SUSP_RACE),position="dodge")
+```
